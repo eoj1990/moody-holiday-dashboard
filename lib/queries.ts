@@ -18,7 +18,7 @@ export async function getMe() {
     .from('profiles')
     .select('*')
     .eq('id', user.id)
-    .single();
+    .maybeSingle(); // avoids 406 error if no row yet
 
   if (error) {
     console.error('Error fetching profile:', error.message);
@@ -38,19 +38,27 @@ export async function getUnitsForProfile(profile: any) {
 
   switch (profile.role) {
     case 'AVP':
+      // Area VP sees all units
       query = query.order('number');
       break;
     case 'DIV':
+      // Division Manager sees only their division
       query = query.eq('division', profile.division).order('number');
       break;
     case 'DM':
+      // District Manager sees only their district
       query = query.eq('district', profile.district).order('number');
       break;
-    default:
+    case 'UM':
+      // Unit Manager sees only their own store
       query = query.eq('number', profile.unit_number).limit(1);
+      break;
+    default:
+      return [];
   }
 
   const { data, error } = await query;
+
   if (error) {
     console.error('Error fetching units:', error.message);
     return [];
@@ -74,6 +82,5 @@ export async function getTaskStatus(unitNumber: string) {
     return [];
   }
 
-  // Return empty array if no tasks yet
   return data || [];
 }
