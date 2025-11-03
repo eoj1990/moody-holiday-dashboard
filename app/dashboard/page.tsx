@@ -5,51 +5,70 @@ import TaskList from '../../components/TaskList';
 import ShowupGrid from '../../components/ShowupGrid';
 import UploadSchedule from '../../components/UploadSchedule';
 
-{/* Example: inside a unit card */}
-<div className="mt-4">
-  <UploadSchedule unitNumber={active.number} />
-</div>
-
-
 export default function Dashboard() {
   const [me, setMe] = useState<any>(null);
   const [units, setUnits] = useState<any[]>([]);
   const [active, setActive] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
-      const p = await getMe();
-      setMe(p);
-      const u = await getUnitsForProfile(p);
+      const profile = await getMe();
+      setMe(profile);
+
+      const u = await getUnitsForProfile(profile);
       setUnits(u);
       setActive(u[0] || null);
+      setLoading(false);
     })();
   }, []);
 
-  if (!me) return null;
+  if (loading) return <div className="p-6 text-gray-500">Loading dashboard…</div>;
+  if (!active) return <div className="p-6 text-red-500">No units found for your profile.</div>;
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-end">
+    <div className="p-6 space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-gray-800">Holiday Dashboard</h1>
         <div>
-          <div className="text-sm text-gray-500">Signed in as</div>
-          <div className="font-semibold">{me.full_name} • {me.role}</div>
-        </div>
-        {units.length > 0 && (
-          <select className="border rounded-xl px-3 py-2"
-            value={active?.id || ''} onChange={e => setActive(units.find(u=>u.id===e.target.value))}>
-            {units.map(u => <option key={u.id} value={u.id}>{u.number} • {u.name || u.district}</option>)}
+          <select
+            value={active.number}
+            onChange={(e) => {
+              const selected = units.find((u) => u.number === e.target.value);
+              setActive(selected);
+            }}
+            className="border rounded-lg px-3 py-2"
+          >
+            {units.map((u) => (
+              <option key={u.id} value={u.number}>
+                {u.number} – {u.name}
+              </option>
+            ))}
           </select>
-        )}
+        </div>
       </div>
 
-      {active && (
-        <>
+      <div className="bg-white p-4 rounded-xl shadow-sm">
+        <h2 className="text-xl font-semibold text-gray-700 mb-2">
+          {active.name} ({active.number})
+        </h2>
+        <p className="text-sm text-gray-500 mb-4">
+          Division: {active.division || '—'} | District: {active.district || '—'}
+        </p>
+
+        {/* ✅ Show-up grid section */}
+        <ShowupGrid unit={active} />
+
+        {/* ✅ Task list section */}
+        <div className="mt-6">
           <TaskList unit={active} />
-          <ShowupGrid unit={active} />
-        </>
-      )}
+        </div>
+
+        {/* ✅ Upload Schedule section */}
+        <div className="mt-6">
+          <UploadSchedule unitNumber={active.number} />
+        </div>
+      </div>
     </div>
   );
-
 }
