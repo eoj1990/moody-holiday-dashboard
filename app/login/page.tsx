@@ -26,3 +26,6 @@ export default function Login() {
     </div>
   );
 }
+options: {
+  emailRedirectTo: 'https://moody-holiday-dashboard.vercel.app/dashboard'
+}
