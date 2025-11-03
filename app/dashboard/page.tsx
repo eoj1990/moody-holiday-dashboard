@@ -3,6 +3,13 @@ import { useEffect, useState } from 'react';
 import { getMe, getUnitsForProfile } from '../../lib/queries';
 import TaskList from '../../components/TaskList';
 import ShowupGrid from '../../components/ShowupGrid';
+import UploadSchedule from '../../components/UploadSchedule';
+
+{/* Example: inside a unit card */}
+<div className="mt-4">
+  <UploadSchedule unitNumber={active.number} />
+</div>
+
 
 export default function Dashboard() {
   const [me, setMe] = useState<any>(null);
@@ -44,4 +51,5 @@ export default function Dashboard() {
       )}
     </div>
   );
+
 }
