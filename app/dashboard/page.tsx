@@ -5,6 +5,7 @@ import { getMe, getUnitsForProfile } from '../../lib/queries';
 import TaskList from '../../components/TaskList';
 import ShowupGrid from '../../components/ShowupGrid';
 import UploadSchedule from '../../components/UploadSchedule';
+import SalesLeaderboard from '../../components/SalesLeaderboard';
 
 export default function Dashboard() {
   const [me, setMe] = useState<any>(null);
@@ -110,6 +111,8 @@ export default function Dashboard() {
           <UploadSchedule unitNumber={active.number} me={me} />
         </div>
       </div>
+{/* 🏆 Sales Leaderboard */}
+<SalesLeaderboard limit={10} />
 
       {/* Footer / Hint */}
       {!me && (
